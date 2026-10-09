@@ -1,0 +1,42 @@
+# Local tool metadata and credentials
+.agents/
+.aws/
+.codex/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Existing offline dependencies and generated builds
+node_modules/
+build/
+dist/
+dist_tmp/
+.xmake/
+__pycache__/
+*.pyc
+.DS_Store
+
+# LaTeX intermediate files; retain source and PDFs
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.xdv
+*.nav
+*.snm
+*.vrb
+*.blg
+*.bcf
+*.run.xml
+
+/References/Books/Computer Vision_ Algorithms and Applications, 2nd Edition - Szeliski_CVAABook_2ndEd.pdf
+
+/Slides/Image Processing.pdf

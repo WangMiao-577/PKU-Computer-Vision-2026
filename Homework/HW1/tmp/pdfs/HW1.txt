@@ -1,0 +1,156 @@
+Computer Vision (2026 fall)                                                                        Homework 1
+
+
+
+                                             Homework 1
+                                               September 2026
+
+      Due: 2026.10.11 23:59:00
+
+
+1     Short questions (25 points)
+1.1     Homogeneous coordinates (10 points)
+      A point in N -dimensional space can be represented by Cartesian coordinates or by homogeneous
+coordinates. The homogeneous representation of a point is not unique.
+
+    1. Let p = (p1 , . . . , pN , s) and q = (q1 , . . . , qN , t) be homogeneous coordinate vectors. Their last
+       coordinates, s and t, are the added coordinates, with s, t ̸= 0. Give a necessary and suﬀicient
+       condition for p and q to represent the same Cartesian point, and write its Cartesian coordinates.
+       (4 points)
+
+    2. Explain two advantages of homogeneous coordinates in computer vision. (6 points)
+
+
+1.2     Rolling shutter (15 points)
+      A shutter controls when the image sensor collects light. A global shutter exposes all rows at once,
+whereas a rolling shutter starts their exposures in sequence; motion can therefore make vertical edges
+appear tilted.
+      Figure 1 compares a global-shutter image (top) with a rolling-shutter image (bottom) of a moving
+train. For this question, assume that the camera is stationary and that row exposures start in order,
+from top to bottom. The train moves horizontally at constant speed, parallel to the image plane. The
+door of the train stays at a constant depth from the camera.
+
+
+
+
+                       Figure 1: Global and rolling shutters imaging a moving train.
+
+
+
+
+                                                                                                              1
+Computer Vision (2026 fall)                                                                                   Homework 1
+
+
+    1. From the assumed scan direction, determine whether the train moves left or right in the rolling-
+           shutter image. (3 points)
+
+    2. The full rolling-shutter image has H = 1000 rows. Scanning all rows takes T = 30 ms in total;
+           the time taken to scan each row is the same. Ignore motion blur within each row. The horizontal
+           focal length is fx = 6000 pixels, and the door is at depth Z = 15 m. In the rolling-shutter image,
+           the door edge spans Y = 300 pixels vertically; its endpoints differ by X = 200 pixels horizontally
+           (see Figure 1). Calculate the train’s speed. Show your formula and calculation steps.1 (12 points)
+
+
+2         Camera height from an image (20 points)
+          Figure 2 shows a 4096 × 3072 campus image. The ground is planar, and the flowerbed marked in
+red is 0.76 m high. Point A is on its top edge; let B be the point directly below A on the ground. Please
+use the full-resolution campus.png in the folder for measurements.
+
+
+
+
+                                                                          Figure 3: Using a known height and the vanishing
+        Figure 2: Campus image with the flowerbed.                        line to estimate camera height.
+
+
+    1. Find the vanishing line using two sets of parallel lines. (10 points)
+
+    2. Use the reference height to estimate the camera height H. Mark A, B, and the vanishing line;
+           report the image measurements and your calculation. Assume the camera is approximately level
+           and ignore lens distortion. (10 points)
+
+          Figure 3 illustrates the height construction.
+    1
+        The numerical values are estimates for this calculation, not real measurements.
+
+
+
+
+                                                                                                                        2
+Computer Vision (2026 fall)                                                                    Homework 1
+
+
+3     Image filtering and subsampling (55 points)
+      This section is designed to help you understand key algorithms in image processing. You will
+implement these functions from scratch in Python with NumPy:
+
+                            cross_correlation_2d           convolve_2d
+                            gaussian_blur_kernel_2d        low_pass
+                            image_subsampling              gaussian_pyramid
+
+3.1    Correlation and convolution (10 points)
+      Image filtering is a fundamental tool of image processing. Refer to the lecture materials or Chapter
+3 of Szeliski’s Computer Vision: Algorithms and Applications (2nd edition) for further reading.
+      Implement cross_correlation_2d without flipping the kernel.
+      Implement convolve_2d by flipping both kernel axes and calling your correlation function.
+
+
+3.2    Gaussian blur and low-pass filtering (10 points)
+      Low pass filters are used to remove high-frequency details from an image, making it appear
+smoother. You can create a low pass filter by applying a Gaussian blur, which computes a weighted
+average of neighboring pixels.
+      Implement gaussian_blur_kernel_2d for a given odd size k and positive standard deviation σ.
+      Implement low_pass using this kernel and your convolution function.
+
+
+3.3    Subsampling (5 points)
+      Subsampling reduces the resolution of an image by discarding rows and columns. Given an image
+of dimensions M × N , subsampling by a factor of s will result in a new image with dimensions (M /s) ×
+(N /s), where M, N should be divisible by s.
+      Implement a simple downsampling method: discard every alternate row and column to produce an
+image that is half the size of the original.
+
+
+3.4    Gaussian pyramid (20 points)
+      A Gaussian pyramid is a multi-scale representation of an image, where each level is progressively
+blurred and downsampled. At each level of the pyramid, the image is smoothed using a Gaussian filter
+and then downsampled to reduce its resolution.
+      Implement a four-level pyramid: the original image and images at approximately 1/2, 1/4, and 1/8
+of its width and height.
+
+
+3.5    Filtered vs direct subsampling (10 points)
+      Use a textured image as the input to the Gaussian pyramid in the previous part. From the same
+input, build a second four-level pyramid by directly downsampling each level by a factor of two, without
+Gaussian filtering or other smoothing. Compare the corresponding levels of the two pyramids. Report
+whether they differ, describe any visible differences, and explain the reasons, including possible aliasing.
+
+
+                                                                                                          3
+Computer Vision (2026 fall)                                                                Homework 1
+
+
+Requirements
+  1. Report. Answer Questions 1 and 2 and include the pyramid comparison from Question 3. You
+     may prepare the report in LaTeX, Markdown, Word, or as scanned handwritten pages, but please
+     do not answer directly on this file. Submit the final report as a PDF.
+
+  2. Code. Submit gaussian_pyramid.py with all required functions. Save both pyramids at 1/2,
+     1/4, and 1/8 resolution. Use relative paths for all image input and output. Briefly list the
+     dependencies and how to run the script. Do not use library functions that directly perform the
+     required filtering or pyramid operations. NumPy array operations are allowed; PIL, OpenCV, or
+     matplotlib may be used for image input, output, and display.
+
+  3. AI declaration. In the report, briefly describe any AI assistance and its purpose. If none was
+     used, say so. If undeclared AI-generated content is found and contains factual errors or code that
+     cannot run, the affected part will receive zero points.
+
+  4. Submitting. Place the PDF report, script, and images in one folder. Zip the folder with the
+     name YOURNAME_YOURID_HW1.zip. For example, 金雨桐_2300013101_HW1.zip.
+
+
+
+
+                                                                                                     4
+

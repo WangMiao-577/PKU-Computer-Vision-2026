@@ -1,0 +1,75 @@
+{
+  "image_size": [
+    4096,
+    3072
+  ],
+  "fitted_segments": {
+    "D1": [
+      [
+        2167.02,
+        2170.0
+      ],
+      [
+        2113.0,
+        2355.0
+      ]
+    ],
+    "D2": [
+      [
+        2836.99,
+        2170.0
+      ],
+      [
+        3086.0,
+        2355.0
+      ]
+    ],
+    "T1": [
+      [
+        1900.0,
+        2374.75
+      ],
+      [
+        4000.0,
+        2350.6
+      ]
+    ],
+    "T2": [
+      [
+        1900.0,
+        2272.875
+      ],
+      [
+        4000.0,
+        2246.1
+      ]
+    ]
+  },
+  "vanishing_point_depth": [
+    2286.4529914529894,
+    1760.9829059829058,
+    1.0
+  ],
+  "vanishing_point_transverse": [
+    -79600.0,
+    3312.0000000000027,
+    1.0
+  ],
+  "horizon_line_a_b_c": [
+    0.018941070682094222,
+    1.0,
+    -1804.2907737053029
+  ],
+  "A": [
+    1891.0,
+    1953.0
+  ],
+  "B": [
+    1891.0,
+    2141.0
+  ],
+  "horizon_y_at_A": 1768.4732090454627,
+  "reference_height_m": 0.76,
+  "camera_height_m": 1.5059593676885552,
+  "description": "Coordinates are full-resolution pixels. Endpoint pairs represent fitted image lines. The camera height uses the approximately level camera assumption."
+}

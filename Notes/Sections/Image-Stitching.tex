@@ -1,0 +1,192 @@
+% !TeX root = ../CV note.tex
+
+\section{Image Stitching}
+
+例子：Paranoma（全景图）的制作，包含了4个步骤涵盖了之前的内容。
+
+\begin{enumerate}
+    \item Extract feature points
+    \item Feature matching
+    \item Solve transformations
+    \item Blend Images
+\end{enumerate}
+
+\subsection{Solve Transformation}
+
+变化的求解要知道图像的变换方法，全景图片中，对图片进行全局变换。
+
+图像变换主要有两种：对图像的函数值进行变换；对图像的定义域进行变换。在本节中侧重于前者。对二维图像的全局变换有平移，旋转，弯折，投影，仿射等多种方法。
+
+\[
+g(\boldsymbol{x}) = T(f(\boldsymbol{x})),
+\qquad
+g(\boldsymbol{x}) = f(T(\boldsymbol{x}))
+\]
+
+\[
+\boldsymbol{p}' = T(\boldsymbol{p})
+\]
+
+对于平移变换和旋转变换，使用齐次坐标可以用一个矩阵统一两种变换。
+
+\[
+\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix}
+\equiv
+\begin{bmatrix} a & b & c \\ d & e & f \\ 0 & 0 & 1 \end{bmatrix}
+\begin{bmatrix} x \\ y \\ 1 \end{bmatrix}
+\equiv T \begin{bmatrix} x \\ y \\ 1 \end{bmatrix},
+\qquad
+\boldsymbol{x}' = \boldsymbol{A}\boldsymbol{x} + \boldsymbol{b}
+\]
+
+平移+旋转的自由度为6,至少需要3个匹配点对数。匹配点对使用SIFTFeature进行探究。最终利用分块矩阵可以写成线性方程组的形式。
+
+\[
+\begin{bmatrix} x_i' \\ y_i' \end{bmatrix}
+=
+\begin{bmatrix} a & b \\ d & e \end{bmatrix}
+\begin{bmatrix} x_i \\ y_i \end{bmatrix}
++
+\begin{bmatrix} c \\ f \end{bmatrix}
+\]
+
+\[
+\begin{bmatrix} \vdots \\ x_i' \\ y_i' \\ \vdots \end{bmatrix}_{2n \times 1}
+=
+\begin{bmatrix} x_i & y_i & 0 & 0 & 1 & 0 \\ 0 & 0 & x_i & y_i & 0 & 1 \end{bmatrix}_{2n \times 6}
+\begin{bmatrix} a \\ b \\ d \\ e \\ c \\ f \end{bmatrix}_{6 \times 1}
+\]
+
+接下来转换为求解线性方程组的优化问题，数学上就是广义逆矩阵的计算。
+
+\[
+E = \|\boldsymbol{A}\boldsymbol{t} - \boldsymbol{b}\|_2^2
+= \boldsymbol{t}^T \boldsymbol{A}^T \boldsymbol{A} \boldsymbol{t}
+- 2 \boldsymbol{t}^T \boldsymbol{A}^T \boldsymbol{b}
++ \boldsymbol{b}^T \boldsymbol{b},
+\qquad
+\frac{\partial E}{\partial \boldsymbol{t}} = 0
+\;\Longrightarrow\;
+\boldsymbol{A}^T \boldsymbol{A} \boldsymbol{t} = \boldsymbol{A}^T \boldsymbol{b}
+\]
+
+对于平移变换上述的处理是可行的，但是对于投影变换（中心投影）是不可行的，自由度不够，要使用Homography方法，也就是把前面方法中的矩阵变成一个$3\times3$的满秩矩阵，下面说明这个呃矩阵的特征和自由度是如何来的。
+
+\[
+\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix}
+\equiv
+\begin{bmatrix} h_{00} & h_{01} & h_{02} \\ h_{10} & h_{11} & h_{12} \\ h_{20} & h_{21} & h_{22} \end{bmatrix}
+\begin{bmatrix} x \\ y \\ 1 \end{bmatrix}
+\equiv H \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}
+\]
+
+\begin{itemize}
+    \item 特征：满秩矩阵，如图投影仿射相当于空间中两个三维锥体的互相变换，需要$3\times3$满秩矩阵
+    \item 由于有公共顶点，3维锥体消去了一个自由度，总共有8个自由度（相当于齐次坐标的缩放比例可以随意设定）
+\end{itemize}
+
+\[
+\underbrace{\boldsymbol{A}}_{2n \times 9}
+\underbrace{\boldsymbol{h}}_{9 \times 1}
+=
+\underbrace{\boldsymbol{0}}_{2n \times 1}
+\]
+
+数学的计算方法增加了两个自由度，需要匹配8个特征点。不能用分块矩阵的最小二乘，需要依次考虑以下问题：
+
+\begin{itemize}
+    \item 8个自由度消去一个：需要增加什么约束？
+    增加模长的约束，可以保证数值稳定性，参数之间都差得不太多。
+    \[
+    \|\boldsymbol{h}\|_2^2 = \boldsymbol{h}^T \boldsymbol{h} = 1
+    \]
+    \item 应当转换为什么线性代数问题：化简展开，得到齐次线性方程组。
+    \[
+    \boldsymbol{A}\boldsymbol{h} = \boldsymbol{0}
+    \]
+    最后，结合前面的模长约束条件，该问题可以转换为拉格朗日乘数法的优化问题，考虑计算二元函数的极值点，得到最终的公式。(实际上，数学本质为奇异值分解方法，得到奇异值和奇异特征向量)。
+    \[
+    E = \|\boldsymbol{A}\boldsymbol{h}\|_2^2,
+    \qquad
+    L = \|\boldsymbol{A}\boldsymbol{h}\|_2^2 + \lambda\left(\|\boldsymbol{h}\|_2^2 - 1\right)
+    = \boldsymbol{h}^T \boldsymbol{A}^T \boldsymbol{A} \boldsymbol{h}
+    + \lambda \boldsymbol{h}^T \boldsymbol{h} - \lambda
+    \]
+    \[
+    \frac{\partial L}{\partial \boldsymbol{h}} = 0
+    \;\Longrightarrow\;
+    \boldsymbol{A}^T \boldsymbol{A} \boldsymbol{h} = \lambda \boldsymbol{h},
+    \qquad
+    E = \lambda,
+    \qquad
+    \boldsymbol{h} = \arg\min_{\|\boldsymbol{h}\|_2 = 1} \|\boldsymbol{A}\boldsymbol{h}\|_2^2
+    \]
+\end{itemize}
+
+当然，前面一系列对模长的分析本质上是代数误差，我们得到大概的初始值以后应该计算图片上向量的几何误差，通过迭代最小化几何误差，令结果更加精确。
+
+\[
+\sum_{i=1}^{k} \left(
+\left\| (x_i', y_i') - T(x_i, y_i) \right\|_2^2
++ \left\| (x_i, y_i) - T^{-1}(x_i', y_i') \right\|_2^2
+\right)
+\]
+
+\subsection{Feature Matching}
+
+SIFT Feature的特征匹配方法最简单的就是最近邻查找，提升效率的算法就是高维的KD Tree。在匹配的时候会出现某些错误匹配的“野点（Outliers）”。
+
+野点的影响以线性回归为例：由于L2损失函数的影响，少量偏差非常大的“野点”会严重干扰最终的拟合结果，所以需要进行去除。
+
+\[
+y = ax + b,
+\qquad
+E = \sum_i \left(a x_i + b - y_i\right)^2
+\]
+
+如何去除野点？首先看线性回归的情况。每次随机挑选一定数量的样本点进行拟合，比较最后拟合模型Inliers的个数，最后选取最多的一组进行最终拟合。在二维图像中，使用Homograph采样方法采样多次得到多组采样点，最后用Geometrtic error判断Outlier的个数和拟合效果。
+
+\[
+\left(1 - G^{P}\right)^{N},
+\qquad
+N > \frac{\log e}{\log\left(1 - G^{P}\right)}
+\]
+
+这就是RANSAC算法，优点是原理简单，缺点是需要的迭代次数可能过多。
+
+替代方案是更换几何损失函数，L2函数会对偏离的点施加极端惩罚，容易导致错误拟合；可以换用Gauss类函数，限制施加惩罚的上限。
+
+\subsection{Image Blending}
+
+使用Laplacian金字塔可以完成图像混合，但是同时计算多个金字塔的工作量较大，为此提出Possion Image Editing方法。
+
+核心想法是：保留图像的梯度，使用目标图像的色调，在裁剪出的区域边界上面直接取目标图像的颜色。
+
+\[
+E = \min_f \sum_{(i,j) \in \Omega}
+\left\| \nabla f(i,j) - \nabla g(i,j) \right\|_2^2,
+\qquad
+f(i,j) = f^{*}(i,j) \quad \big((i,j) \in \partial\Omega\big)
+\]
+
+回到数学方法，优化对象由两个向量范数组成：第一个范数衡量梯度之间的差异，对图像求梯度可以用一个Jordan形矩阵乘法表示；第二个是色调的差异，要求边界点色调差异尽量小。参数lambda仍然是lagrange乘数法
+
+\[
+\nabla f = \begin{bmatrix} -1 & 1 \end{bmatrix} f
+\]
+
+\[
+\min_f \|Af - G\|_2^2 + \lambda \|Bf - F\|_2^2
+\qquad \Longrightarrow \qquad
+\left(A^T A + \lambda B^T B\right) f = b
+\]
+
+由于结果相当于是稀疏矩阵的处理，有Gauss迭代和Jacobi迭代方法。观察到公式中的梯度算子A和散度算子的乘积，实际上是得到了laplace算子，于是原问题的数学模型转换为Possion方程的近似求解。
+
+\subsection{3D Vision}
+
+3D视觉重建，主要做的就是从图像中恢复出三维的结构。基本的3D重建工作是从不同角度找到对应点，得到深度图，把各个方向的深度图融合为点云表示，用图形学方法将点云表现为三角形网格，最后进行重建。
+
+单个视角具有奇异性，为了解决这类问题，可以使用激光方法直接计算距离，也可以从不同角度和光照拍多张图片。
+
+当代三维重建和深度图可以用Transformer方法和机器学习算法进行。

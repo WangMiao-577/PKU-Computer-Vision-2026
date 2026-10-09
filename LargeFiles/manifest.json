@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "chunk_bytes": 33554432,
+  "files": [
+    {
+      "path": "References/Books/Computer Vision_ Algorithms and Applications, 2nd Edition - Szeliski_CVAABook_2ndEd.pdf",
+      "bytes": 171665137,
+      "sha256": "58c0e05ce751dc138170e3b58f5f6ef78c05200097048a83d6529fafbbddfb22",
+      "parts": [
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0001.bin",
+          "bytes": 33554432,
+          "sha256": "3e7861fa988b7997678ba4cc9dece7daf80e1c88920882d75bc47fa7adbef0bf"
+        },
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0002.bin",
+          "bytes": 33554432,
+          "sha256": "fe5c3b94e0b0fe9ba744978e13c2a19365f6fe481218e3b84dbfffe1ae8d2a6a"
+        },
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0003.bin",
+          "bytes": 33554432,
+          "sha256": "f4538f782e71098fb81820bab00b5fad762ee204c1a7072d1f83e0707ea1dd27"
+        },
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0004.bin",
+          "bytes": 33554432,
+          "sha256": "372ec7467c46944ab273103227d0dc08aa76e98fdff6724340bf2f6c93367ab8"
+        },
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0005.bin",
+          "bytes": 33554432,
+          "sha256": "cfa2093b93fc8099e8d3801fa300405e24fc702e1e500fba972c8cdcee7e22e1"
+        },
+        {
+          "path": "LargeFiles/58c0e05ce751dc13/part-0006.bin",
+          "bytes": 3892977,
+          "sha256": "8b02ec5a01e10a7b7c27b2480b982fe54a8e62ead2b81ca1d319228e0d5542a2"
+        }
+      ]
+    },
+    {
+      "path": "Slides/Image Processing.pdf",
+      "bytes": 94702506,
+      "sha256": "7a174716e51ba1773c291ce73eff6675fac8f4d571d1fe0a852dbbe500155793",
+      "parts": [
+        {
+          "path": "LargeFiles/7a174716e51ba177/part-0001.bin",
+          "bytes": 33554432,
+          "sha256": "81928630be58614992a50355bd9af6d7b222f93e46196b48eb82b1585e12252d"
+        },
+        {
+          "path": "LargeFiles/7a174716e51ba177/part-0002.bin",
+          "bytes": 33554432,
+          "sha256": "593043bac80118d336a51e16e8a3a49bee33ba4f69379bb4950c6b7d89f86a92"
+        },
+        {
+          "path": "LargeFiles/7a174716e51ba177/part-0003.bin",
+          "bytes": 27593642,
+          "sha256": "13b410f5d5677fd269f0e3d08105df7074b418cb353f8c31a3f646da484abb72"
+        }
+      ]
+    }
+  ]
+}
